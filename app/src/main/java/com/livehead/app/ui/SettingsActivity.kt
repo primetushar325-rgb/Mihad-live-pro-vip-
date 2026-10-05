@@ -72,7 +72,7 @@ class SettingsActivity : Activity() {
         }
 
         findViewById<TextView>(R.id.about_version).text =
-            "${getString(R.string.app_version)}: ${App.VERSION_NAME} (${App.VERSION_CODE})"
+            "${getString(R.string.app_version)}: ${App.instance.versionName} (${App.instance.versionCode})"
 
         // persist on close
         val persist = {

@@ -10,7 +10,16 @@ TOOLS="${LH_TOOLS:-/tmp/lh-tools}"
 VENV="${LH_VENV:-/tmp/venv}"
 PORT="${TEST_PORT:-19351}"
 
-JH="$("$VENV/bin/python" -c 'import jdk4py;print(jdk4py.JAVA_HOME)')"
+# JDK: prefer the sandbox's jdk4py venv; fall back to any pre-set JAVA_HOME (CI).
+if [ -x "$VENV/bin/python" ] && "$VENV/bin/python" -c 'import jdk4py' >/dev/null 2>&1; then
+  JH="$("$VENV/bin/python" -c 'import jdk4py;print(jdk4py.JAVA_HOME)')"
+else
+  JH="${JAVA_HOME:-$(command -v java >/dev/null 2>&1 && dirname "$(dirname "$(command -v java)")" || true)}"
+fi
+if [ -z "$JH" ] || [ ! -x "$JH/bin/java" ]; then
+  echo "ERROR: no JDK found (set JAVA_HOME or create $VENV with jdk4py)" >&2
+  exit 1
+fi
 export JAVA_HOME="$JH"
 export PATH="$JH/bin:$PATH"
 

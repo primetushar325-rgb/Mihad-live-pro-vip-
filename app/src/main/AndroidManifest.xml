@@ -41,6 +41,13 @@
 
         <activity android:name=".ui.DiagnosticsActivity" android:exported="false" />
 
+        <!-- Emergency error screen shown by the crash reporter -->
+        <activity
+            android:name=".ui.CrashReportActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true" />
+
         <service
             android:name=".service.StreamingService"
             android:exported="false"

@@ -39,6 +39,13 @@ object AppLog {
     fun w(tag: String, msg: String) = log(WARNING, tag, msg)
     fun e(tag: String, msg: String) = log(ERROR, tag, msg)
 
+    /** Error with stack trace (used by the crash reporter and fallbacks). */
+    fun e(tag: String, msg: String, t: Throwable) {
+        val stack = t.stackTrace.joinToString("\n") { "    at $it" }
+        log(ERROR, tag, msg + ": " + t.javaClass.name + ": " + (t.message ?: "") +
+            "\n" + stack.take(4000))
+    }
+
     fun log(level: Int, tag: String, msg: String) {
         val entry = Entry(System.currentTimeMillis(), level, tag, redact(msg))
         synchronized(lock) {
@@ -54,6 +61,9 @@ object AppLog {
 
     /** Newest-last snapshot of the ring buffer. */
     fun snapshot(): List<String> = synchronized(lock) { buffer.map { it.line() } }
+
+    /** Last [n] lines as one string (used by the crash reporter). */
+    fun tail(n: Int): String = synchronized(lock) { buffer.toList().takeLast(n).joinToString("\n") { it.line() } }
 
     fun snapshotText(): String = snapshot().joinToString("\n")
 

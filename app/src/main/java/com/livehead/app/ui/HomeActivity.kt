@@ -109,13 +109,46 @@ class HomeActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        config = PrefsConfigRepository(this)
-        setContentView(R.layout.activity_home)
-        bindViews()
-        restoreState()
-        wireActions()
-        maybeRequestNotificationPermission()
-        observeController()
+        // Startup discipline: if ANYTHING in the launch path throws, the app
+        // still opens — it falls back to a programmatic error screen showing
+        // the exact exception (no adb needed to diagnose it).
+        try {
+            config = PrefsConfigRepository(this)
+            setContentView(R.layout.activity_home)
+            bindViews()
+            restoreState()
+            wireActions()
+            maybeRequestNotificationPermission()
+            observeController()
+        } catch (t: Throwable) {
+            AppLog.e(TAG, "startup failed", t)
+            showStartupError(t)
+        }
+    }
+
+    /**
+     * Programmatic fallback screen (no XML/resources) for a failed launch
+     * path. The user sees the app open + the exact error instead of a crash.
+     */
+    private fun showStartupError(t: Throwable) {
+        try {
+            val stack = android.util.Log.getStackTraceString(t)
+            val scroll = ScrollView(this)
+            val tv = TextView(this)
+            tv.text = "LIVE HEAD started in recovery mode.\n\n" +
+                "The main screen could not load:\n\n$stack\n\n" +
+                "This text can be selected and copied for a bug report. " +
+                "Try restarting the app."
+            tv.textSize = 12f
+            tv.setTextColor(0xFFE9EEF6.toInt())
+            tv.setTextIsSelectable(true)
+            tv.setPadding(48, 64, 48, 48)
+            scroll.setBackgroundColor(0xFF0D1117.toInt())
+            scroll.addView(tv)
+            setContentView(scroll)
+        } catch (ignore: Throwable) {
+            // nothing left to do — the global crash reporter takes over
+        }
     }
 
     private fun bindViews() {
@@ -174,10 +207,38 @@ class HomeActivity : Activity() {
         if (uriStr != null) {
             try {
                 val u = Uri.parse(uriStr)
-                contentResolver.takePersistableUriPermission(
-                    u, Intent.FLAG_GRANT_READ_URI_PERMISSION
-                )
-                probeAndShow(u, config.videoName ?: "video", silent = true)
+                try {
+                    contentResolver.takePersistableUriPermission(
+                        u, Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    )
+                } catch (ignore: Throwable) {}
+
+                // Show the remembered name immediately; re-probe the video
+                // OFF the main thread (MediaMetadataRetriever can be slow on
+                // large files — it must never block app launch).
+                videoName.text = config.videoName ?: "video"
+                videoDetails.text = getString(R.string.status_connecting)
+                Thread {
+                    val meta = probe(u)
+                    mainHandler.post {
+                        if (isDestroyed || isFinishing) return@post
+                        if (meta != null) {
+                            selectedUri = u
+                            selectedMeta = meta
+                            videoName.text = meta.name
+                            videoDetails.text = buildString {
+                                append(Fmt.duration(meta.durationMs))
+                                append("  •  ${meta.width}×${meta.height}")
+                                append(if (meta.hasAudio) "  •  audio ✓" else "  •  silent (AAC silence will be added)")
+                            }
+                            preview.visibility = View.VISIBLE
+                            previewControls.visibility = View.VISIBLE
+                            btnPreviewToggle.text = getString(R.string.preview)
+                        } else {
+                            videoDetails.text = getString(R.string.err_video_unreadable)
+                        }
+                    }
+                }.apply { isDaemon = true }.start()
             } catch (ignore: Throwable) {
             }
         }

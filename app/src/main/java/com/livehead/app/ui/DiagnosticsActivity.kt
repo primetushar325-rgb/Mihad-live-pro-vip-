@@ -72,11 +72,16 @@ class DiagnosticsActivity : Activity() {
             appendLine("Elapsed:        ${Fmt.duration(s.elapsedMs)}")
         }
 
-        findViewById<TextView>(R.id.diag_log).text = AppLog.snapshotText()
+        val crash = try {
+            java.io.File(filesDir, "last_crash.txt").takeIf { it.exists() }?.readText()
+        } catch (ignore: Throwable) { null }
+        findViewById<TextView>(R.id.diag_log).text =
+            (if (crash != null) "=== LAST CRASH ===\n$crash\n\n" else "") + AppLog.snapshotText()
     }
 
     private fun exportLog() {
-        val text = "LIVE HEAD diagnostics\n\n" + findViewById<TextView>(R.id.diag_values).text + "\n\n=== LOG ===\n" + AppLog.snapshotText()
+        val text = "LIVE HEAD diagnostics\n\n" + findViewById<TextView>(R.id.diag_values).text +
+            "\n\n" + findViewById<TextView>(R.id.diag_log).text
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, text)

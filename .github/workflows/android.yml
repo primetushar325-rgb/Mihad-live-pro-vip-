@@ -1,0 +1,61 @@
+name: Android CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Tests + Release APK
+    runs-on: ubuntu-latest
+    env:
+      LH_TOOLS: /tmp/lh-tools
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install host tools
+        run: sudo apt-get update && sudo apt-get install -y zip
+
+      - name: Fetch offline Android toolchain (aapt2, kotlinc, d8, zipalign, apksigner)
+        run: ./tools/fetch-tools.sh
+
+      - name: Run unit + protocol integration tests
+        run: ./tools/test-protocol.sh
+
+      - name: Build release APK
+        run: VERSION_NAME=1.0.1 VERSION_CODE=2 ./build.sh
+
+      - name: Verify APK
+        run: |
+          "$JAVA_HOME/bin/java" -jar /tmp/lh-tools/lib/apksigner.jar verify --print-certs release/LiveHead-v1.0.1.apk
+          /tmp/lh-tools/bin/zipalign -c 4 release/LiveHead-v1.0.1.apk
+          sha256sum release/LiveHead-v1.0.1.apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LIVE-HEAD-release
+          path: release/LiveHead-v1.0.1.apk
+          if-no-files-found: error
+
+      - name: Upload test logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs
+          path: .cli-build/
+          if-no-files-found: ignore
