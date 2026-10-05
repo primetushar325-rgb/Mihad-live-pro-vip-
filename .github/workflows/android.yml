@@ -37,19 +37,19 @@ jobs:
         run: ./tools/test-protocol.sh
 
       - name: Build release APK
-        run: VERSION_NAME=1.0.1 VERSION_CODE=2 ./build.sh
+        run: LIVEDEX=1 VERSION_NAME=1.0.2 VERSION_CODE=3 ./build.sh
 
       - name: Verify APK
         run: |
-          "$JAVA_HOME/bin/java" -jar /tmp/lh-tools/lib/apksigner.jar verify --print-certs release/LiveHead-v1.0.1.apk
-          /tmp/lh-tools/bin/zipalign -c 4 release/LiveHead-v1.0.1.apk
-          sha256sum release/LiveHead-v1.0.1.apk
+          "$JAVA_HOME/bin/java" -jar /tmp/lh-tools/lib/apksigner.jar verify --print-certs release/LiveHead-v1.0.2.apk
+          /tmp/lh-tools/bin/zipalign -c 4 release/LiveHead-v1.0.2.apk
+          sha256sum release/LiveHead-v1.0.2.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: LIVE-HEAD-release
-          path: release/LiveHead-v1.0.1.apk
+          path: release/LiveHead-v1.0.2.apk
           if-no-files-found: error
 
       - name: Upload test logs on failure

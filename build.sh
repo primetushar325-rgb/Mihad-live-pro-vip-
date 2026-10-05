@@ -84,14 +84,31 @@ find "$APP/java" -name '*.kt' | sort > "$BUILD/sources.txt"
   "@$BUILD/sources.txt" "$BUILD/R.kt"
 echo "   compiled $(find "$BUILD/classes" -name '*.class' | wc -l) classes"
 
-echo "== d8 (dex, min-api 26, kotlin-stdlib included) =="
+echo "== d8 (dex, kotlin-stdlib included) =="
+# NOTE: the dex is built with --min-api 21, NOT 26, on purpose. This d8 build
+# maps min-api to the HIGHEST dex version it permits (21->035, 24->037,
+# 26->038, 28->039). DEX 038/039 can only be loaded by Android 9/10+, which
+# would crash the app at launch on Android 8.0/8.1 (API 26/27) with
+# ClassNotFoundException ("unsupported dex version") even though the manifest
+# minSdk is 26 — the installer does not validate the dex version. DEX 035 is
+# loadable by every Android >= 5.0, which is strictly below our minSdk 26, so
+# it is universally safe; the only cost is a few KB of extra desugaring.
 (cd "$BUILD/classes" && zip -q -r "$BUILD/classes.zip" .)
 "$JAVA" -cp "$D8_JAR" com.android.tools.r8.D8 \
   --release \
   --lib "$PLATFORM" \
-  --min-api 26 \
+  --min-api 21 \
   --output "$BUILD/dex" \
   "$BUILD/classes.zip" "$STDLIB"
+
+# Hard guard: never again ship a dex that older runtimes cannot load.
+DEXVER="$(python3 "$ROOT/tools/dexversion.py" "$BUILD/dex/classes.dex")"
+if [ "$DEXVER" != "035" ]; then
+  echo "ERROR: classes.dex is version $DEXVER, which is not loadable on all" >&2
+  echo "       Android >= 8.0 devices (need 035). Refusing to package." >&2
+  exit 1
+fi
+echo "   dex version: 035 (universally loadable)"
 ls -la "$BUILD/dex/"
 
 echo "== package =="
