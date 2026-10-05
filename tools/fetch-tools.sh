@@ -83,7 +83,7 @@ if [ ! -f "$TOOLS/lib/android-33.jar" ]; then
   (cd "$CACHE/cirq" && git sparse-checkout set android-33 >/dev/null 2>&1)
   cp "$CACHE/cirq/android-33/android.jar" "$TOOLS/lib/android-33.jar"
 fi
-unzip -l "$TOOLS/lib/android-33.jar" 2>/dev/null | grep -q resources.arsc || {
+unzip -l "$TOOLS/lib/android-33.jar" 2>/dev/null | grep resources.arsc > /dev/null || {
   echo "android.jar missing resources.arsc" >&2; exit 3; }
 echo "   android-33.jar OK (with resources.arsc)"
 

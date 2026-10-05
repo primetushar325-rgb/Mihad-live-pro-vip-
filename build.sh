@@ -115,9 +115,15 @@ echo "== package =="
 cp "$BUILD/base.apk" "$BUILD/unsigned.apk"
 zip -q -j "$BUILD/unsigned.apk" "$BUILD/dex/classes.dex"
 
-if LD_LIBRARY_PATH="$TOOLS/lib64" "$TOOLS/bin/zipalign" 2>&1 | grep -i "alignment" > /dev/null; then
+if [ -x "$TOOLS/bin/zipalign" ]; then
   echo "== zipalign =="
-  LD_LIBRARY_PATH="$TOOLS/lib64" "$TOOLS/bin/zipalign" -f 4 "$BUILD/unsigned.apk" "$BUILD/aligned.apk"
+  if LD_LIBRARY_PATH="$TOOLS/lib64" "$TOOLS/bin/zipalign" -f 4 "$BUILD/unsigned.apk" "$BUILD/aligned.apk" &&
+     LD_LIBRARY_PATH="$TOOLS/lib64" "$TOOLS/bin/zipalign" -c 4 "$BUILD/aligned.apk"; then
+    echo "   aligned + verified"
+  else
+    echo "   WARNING: zipalign failed — shipping unaligned APK" >&2
+    cp "$BUILD/unsigned.apk" "$BUILD/aligned.apk"
+  fi
 else
   echo "== zipalign skipped (tool unavailable) =="
   cp "$BUILD/unsigned.apk" "$BUILD/aligned.apk"
