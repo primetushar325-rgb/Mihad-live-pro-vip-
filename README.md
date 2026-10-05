@@ -95,10 +95,40 @@ keytool -genkeypair -v -keystore keystore/prod.jks -alias livehead \
   -keyalg RSA -keysize 2048 -validity 10000 -storetype PKCS12
 ```
 
+## Startup safety & self-diagnosis
+
+LIVE HEAD follows strict startup discipline:
+
+- `Application.onCreate()` does only two things: create the notification
+  channel and install the crash reporter. No streaming engine, no network,
+  no MediaCodec, no file scanning at launch.
+- The streaming engine exists **only** inside the foreground service, which
+  starts **only** when the user presses START LIVE.
+- Remembered-video re-probing runs on a background thread — app launch is
+  never blocked by MediaMetadataRetriever.
+- If anything in the launch path throws, `HomeActivity` falls back to a
+  programmatic recovery screen showing the exact exception.
+- On any uncaught exception the app shows **CrashReportActivity**: the full
+  stack trace (selectable/copyable, no adb needed), also written to
+  `filesDir/last_crash.txt` and `Android/data/com.livehead.app/files/last_crash.txt`,
+  and shown in Diagnostics → LOG.
+
+**If the app does not open on your phone:** install the latest APK, open it —
+if there is a crash you will now see the red problem-report screen. Copy that
+text and report it; it contains the exact root cause. If instead the phone
+shows a black screen or nothing at all, also check that the downloaded file
+matches the published SHA-256 (a truncated/mangled download can install but
+fail to start).
+
+## CI
+
+GitHub Actions (`.github/workflows/android.yml`) runs the full test suite and
+builds the release APK on every push — artifact name: `LIVE-HEAD-release`.
+
 ## Test
 
 ```bash
-./tools/test-protocol.sh      # 31 unit tests + full protocol integration test
+./tools/test-protocol.sh      # 35 unit + integration tests (JVM, no emulator)
 ```
 
 - **Unit tests (JVM, no emulator):** Pacer virtual-clock behavior (6), AMF0
