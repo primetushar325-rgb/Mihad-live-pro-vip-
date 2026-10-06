@@ -68,14 +68,12 @@ object StreamingController {
 
     fun startStream(
         context: Context,
-        uri: String,
         url: String,
         key: String,
         settings: StreamSettings,
     ) {
         val intent = Intent(context, StreamingService::class.java).apply {
             action = StreamingService.ACTION_START
-            putExtra("uri", uri)
             putExtra("url", url)
             putExtra("key", key)
             putExtra("res", settings.resolution.name)

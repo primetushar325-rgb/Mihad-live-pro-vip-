@@ -1,8 +1,16 @@
-# LIVE HEAD — Local Video → RTMPS → YouTube Live
+# LIVE HEAD — Camera → RTMPS → YouTube Live
 
-A dependency-free Android app (package `com.livehead.app`) that streams a
-**video file stored on the device** to a **YouTube Live** ingestion endpoint,
-24×7, looped, with anti-freeze protection as the top engineering priority.
+**v2.0.0 is a camera live-streaming app**: stream your phone's **camera +
+microphone** to a **YouTube Live** RTMPS endpoint, with anti-freeze
+protection as the top engineering priority and launch reliability as the
+first commandment. (v1.x streamed a local video file; that protocol stack is
+kept in the tree — see `stream/RtmpStreamingEngine` — but the product is now
+camera-first.)
+
+Startup is featherweight by design: `App.onCreate()` only creates the
+notification channel and installs the crash reporter. The camera opens ONLY
+when the user taps **Enable camera preview**; the streaming engine is created
+ONLY by the foreground service after **START LIVE**.
 
 Built with **zero third-party libraries** — no AndroidX, no Jetpack Compose,
 no OkHttp, no ExoPlayer, no Kotlin coroutines. Plain `android.view` UI,

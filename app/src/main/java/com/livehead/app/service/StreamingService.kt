@@ -27,7 +27,7 @@ import com.livehead.app.core.StateFlow
 import com.livehead.app.data.EngineState
 import com.livehead.app.data.EngineStats
 import com.livehead.app.data.StreamSettings
-import com.livehead.app.stream.RtmpStreamingEngine
+import com.livehead.app.stream.CameraStreamingEngine
 import com.livehead.app.stream.StreamingEngine
 import com.livehead.app.stream.rtmp.RtmpEndpoint
 import com.livehead.app.ui.HomeActivity
@@ -82,7 +82,6 @@ class StreamingService : Service() {
                 return START_NOT_STICKY
             }
             ACTION_START -> {
-                val uri = intent.getStringExtra("uri")
                 val url = intent.getStringExtra("url")
                 val key = intent.getStringExtra("key")
                 val settings = StreamSettings(
@@ -94,8 +93,17 @@ class StreamingService : Service() {
                     reconnectEnabled = intent.getBooleanExtra("reconnect", true),
                     maxRetryIntervalSec = intent.getIntExtra("max_retry", 30),
                 )
-                if (uri.isNullOrEmpty() || url.isNullOrEmpty() || key.isNullOrEmpty()) {
+                if (url.isNullOrEmpty() || key.isNullOrEmpty()) {
                     AppLog.e(TAG, "start requested without complete parameters")
+                    stopSelf()
+                    return START_NOT_STICKY
+                }
+                // Android 14: a camera/microphone foreground service must not
+                // start without the runtime permissions already granted.
+                if (checkSelfPermission(android.Manifest.permission.CAMERA) != android.content.pm.PackageManager.PERMISSION_GRANTED ||
+                    checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) != android.content.pm.PackageManager.PERMISSION_GRANTED
+                ) {
+                    StreamingController.publishError("Camera and microphone permissions are required to go live.")
                     stopSelf()
                     return START_NOT_STICKY
                 }
@@ -110,7 +118,7 @@ class StreamingService : Service() {
                     startEnvironmentMonitoring()
                     acquireWakeLock()
                     running = true
-                    val e = RtmpStreamingEngine(this, endpoint, android.net.Uri.parse(uri), settings)
+                    val e = CameraStreamingEngine(this, endpoint, settings)
                     engine = e
                     e.stats.subscribe { onStats(it) }
                     StreamingController.attach(e.stats, envStats)
@@ -126,7 +134,15 @@ class StreamingService : Service() {
     }
 
     private fun startForegroundTyped(notification: Notification) {
-        if (Build.VERSION.SDK_INT >= 29) {
+        if (Build.VERSION.SDK_INT >= 30) {
+            // Android 14 enforces the declared types; camera+microphone is
+            // what this service actually uses while live.
+            startForeground(
+                NOTIF_ID, notification,
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA or
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE,
+            )
+        } else if (Build.VERSION.SDK_INT >= 29) {
             startForeground(NOTIF_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
         } else {
             startForeground(NOTIF_ID, notification)
