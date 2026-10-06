@@ -2,6 +2,7 @@
 .cli-build/
 build/
 out/
+release/*.apk
 release/*.apk.id
 .gradle/
 .idea/

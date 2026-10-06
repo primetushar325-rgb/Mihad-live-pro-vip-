@@ -128,10 +128,20 @@ shows a black screen or nothing at all, also check that the downloaded file
 matches the published SHA-256 (a truncated/mangled download can install but
 fail to start).
 
+## Download the APK
+
+Built by **GitHub Actions** on every push (full test suite → build → verify
+signature/alignment/dex version) and published to the GitHub Release:
+
+**https://github.com/primetushar325-rgb/Mihad-live-pro-vip-/releases/download/v2.0.0/LiveHead-v2.0.0.apk**
+
+Binaries are never committed to the repo — the only APK source is CI.
+
 ## CI
 
 GitHub Actions (`.github/workflows/android.yml`) runs the full test suite and
-builds the release APK on every push — artifact name: `LIVE-HEAD-release`.
+builds the release APK on every push — artifact name: `LIVE-HEAD-release`,
+plus a public release asset (direct download link above).
 
 ## Test
 
