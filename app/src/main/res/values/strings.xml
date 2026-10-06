@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LIVE HEAD</string>
+    <string name="tagline">Stream a local video live to YouTube — no account, no API</string>
+
+    <!-- Video section -->
+    <string name="section_video">Video</string>
+    <string name="select_video">Select video</string>
+    <string name="change_video">Change video</string>
+    <string name="no_video_selected">No video selected</string>
+    <string name="preview">Preview</string>
+    <string name="stop_preview">Stop preview</string>
+
+    <!-- YouTube section -->
+    <string name="section_youtube">YouTube</string>
+    <string name="stream_url">YouTube Stream URL</string>
+    <string name="stream_url_hint">rtmps://a.rtmp.youtube.com/live2</string>
+    <string name="stream_key">Stream key</string>
+    <string name="stream_key_hint">xxxx-xxxx-xxxx-xxxx</string>
+    <string name="show">SHOW</string>
+    <string name="hide">HIDE</string>
+    <string name="remember_key">Remember stream key (encrypted)</string>
+
+    <!-- Settings section -->
+    <string name="section_settings">Streaming settings</string>
+    <string name="resolution">Resolution</string>
+    <string name="fps">FPS</string>
+    <string name="bitrate">Bitrate</string>
+    <string name="loop_video">Loop video</string>
+    <string name="keyframe_interval">Keyframe interval</string>
+    <string name="battery_hint_title">Allow background streaming</string>
+    <string name="battery_hint_body">For long sessions, exclude LIVE HEAD from battery optimization. Your stream keeps running when the screen is off.</string>
+
+    <!-- Actions -->
+    <string name="start_live">START LIVE</string>
+    <string name="stop_live">STOP LIVE</string>
+    <string name="retry">RETRY</string>
+    <string name="settings">Settings</string>
+    <string name="diagnostics">Diagnostics</string>
+    <string name="export_log">Export diagnostic log</string>
+    <string name="open_app">Open app</string>
+
+    <!-- Status -->
+    <string name="status_offline">OFFLINE</string>
+    <string name="status_live">LIVE</string>
+    <string name="status_connecting">CONNECTING…</string>
+    <string name="status_reconnecting">RECONNECTING…</string>
+    <string name="status_stalled">STALLED</string>
+    <string name="status_stopped">STOPPED</string>
+    <string name="status_error">ERROR</string>
+    <string name="status_finished">FINISHED</string>
+
+    <!-- Live screen -->
+    <string name="elapsed">Elapsed</string>
+    <string name="network">Network</string>
+    <string name="dropped_frames">Dropped frames</string>
+    <string name="reconnects">Reconnects</string>
+    <string name="connection_stable">Stable</string>
+    <string name="connection_unstable">Unstable</string>
+    <string name="battery">Battery</string>
+    <string name="upload_health_warning">Your upload connection may not be stable enough for this bitrate.</string>
+    <string name="thermal_warning">Device is getting hot. Consider lowering resolution or bitrate.</string>
+    <string name="battery_low_warning">Battery is low. Long streaming may stop if the device powers off.</string>
+
+    <!-- Diagnostics -->
+    <string name="diag_title">Streaming diagnostics</string>
+    <string name="log_title">Diagnostic log</string>
+    <string name="codec_colon">Encoder</string>
+
+    <!-- Errors -->
+    <string name="err_no_video">Please select a video first.</string>
+    <string name="err_video_unreadable">Video cannot be opened. Try re-selecting it from the picker.</string>
+    <string name="err_no_video_track">This video has no video track.</string>
+    <string name="err_unsupported_video">This video format is not supported on this device.</string>
+    <string name="err_bad_url">Stream URL is invalid. It should look like rtmps://a.rtmp.youtube.com/live2</string>
+    <string name="err_no_key">Stream key is missing.</string>
+    <string name="err_no_internet">No Internet connection.</string>
+    <string name="err_encoder">Encoder initialization failed. Try lowering resolution or bitrate.</string>
+    <string name="err_connection_failed">YouTube connection failed. Please verify your Stream URL and Stream Key.</string>
+    <string name="err_connection_lost">Connection lost. Reconnecting…</string>
+    <string name="err_generic">Something went wrong.</string>
+
+    <!-- Settings screen -->
+    <string name="settings_title">Settings</string>
+    <string name="default_resolution">Default resolution</string>
+    <string name="default_fps">Default FPS</string>
+    <string name="default_bitrate">Default bitrate</string>
+    <string name="default_keyframe">Keyframe interval (seconds)</string>
+    <string name="loop_default">Loop video by default</string>
+    <string name="reconnect_enabled">Reconnect automatically</string>
+    <string name="max_retry_interval">Maximum retry interval (seconds)</string>
+    <string name="power_section">Power</string>
+    <string name="battery_guide">Battery optimization guide</string>
+    <string name="security_section">Security</string>
+    <string name="clear_saved_key">Clear saved stream key</string>
+    <string name="key_cleared">Saved stream key cleared.</string>
+    <string name="diagnostics_section">Diagnostics</string>
+    <string name="view_logs">View streaming diagnostics</string>
+    <string name="about_section">About</string>
+    <string name="about_body">LIVE HEAD streams a video file from your phone directly to a YouTube RTMPS ingest endpoint. No account, no YouTube API, no tracking, no analytics. The phone is the encoder.</string>
+
+    <!-- Misc -->
+    <string name="battery_recommended">Recommended</string>
+    <string name="battery_ok">Unrestricted</string>
+    <string name="battery_restricted">Restricted</string>
+    <string name="not_available">–</string>
+    <string name="app_version">LIVE HEAD version</string>
+    <string name="battery_low">Battery low (%1$d%%) — connect a charger to keep streaming</string>
+</resources>

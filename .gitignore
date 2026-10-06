@@ -1,0 +1,24 @@
+# Build outputs
+.cli-build/
+build/
+out/
+release/*.apk
+release/*.apk.id
+.gradle/
+.idea/
+*.iml
+local.properties
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Signing keys are NEVER committed
+keystore/*.jks
+keystore/*.keystore
+
+# Local tool cache (fetched by tools/fetch-tools.sh)
+.tools/
+
+# OS junk
+.DS_Store
+release/*.idsig

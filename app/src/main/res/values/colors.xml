@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg">#FF0D1117</color>
+    <color name="bg_elev">#FF10161E</color>
+    <color name="surface">#FF161C24</color>
+    <color name="surface_2">#FF1B2330</color>
+    <color name="stroke">#FF263040</color>
+    <color name="stroke_input">#FF2A3648</color>
+
+    <color name="on_surface">#FFE9EEF6</color>
+    <color name="on_surface_muted">#FF93A1B5</color>
+    <color name="on_surface_faint">#FF5C6B80</color>
+
+    <color name="live_red">#FFFF4655</color>
+    <color name="live_red_dark">#FFE5303F</color>
+    <color name="live_red_container">#FF3A1216</color>
+
+    <color name="ok_green">#FF2FD57C</color>
+    <color name="ok_green_container">#FF10301F</color>
+    <color name="warn_yellow">#FFFFC53D</color>
+    <color name="warn_yellow_container">#FF33290D</color>
+
+    <color name="ic_launcher_bg">#FF111820</color>
+</resources>
